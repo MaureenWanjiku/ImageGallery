@@ -87,12 +87,6 @@ const Upload = ({ isOpen, onClose }) => {
 
                 </div>
 
-                {/* <Button disabled={uploading}>
-          {uploading ? "Uploading..." : "Upload"}
-        </Button> */}
-
-
-
                 <Button onClick={handleImageUpload} disabled={uploading} className='bg-cyan-600 hover:bg-cyan-700'>
                     {uploading ? 'Uploading...' : 'Add Image'}
                 </Button>

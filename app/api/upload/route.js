@@ -19,7 +19,7 @@ export async function POST(req) {
     const formData = await req.formData()
 
     const file = formData.get('file')
-
+    
     //check if file exists
     if (!file) {
       return NextResponse.json({ error: 'No file Uploaded' }, { status: 400 })

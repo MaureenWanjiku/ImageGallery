@@ -1,13 +1,31 @@
 'use client'
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { IoMdReverseCamera } from "react-icons/io";
-import { MdOutlineFileUpload } from "react-icons/md";
-import Upload from '../upload/page';
+import { FiDownload } from "react-icons/fi";
+import Nav from '../nav/page';
 
-const Home = () => {
+const DisplayImages = () => {
   const [images, setImages] = useState([])
-  const [uploadModal, setUploadModal] = useState(false)
+  const [myImages, setMyImages] = useState([])
+  
+  const downloadImage = async(url) => {
+    try {
+      const response = await fetch(url)
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = 'image.jpg'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
+  }
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -15,6 +33,12 @@ const Home = () => {
         const response = await fetch('api/images')
         const data = await response.json();
         setImages(data)
+
+        const result = await fetch('api/fetchImages')
+        const dbImages = await result.json();
+        setMyImages(dbImages)
+
+
       } catch (error) {
         console.error('Error Fetching Images front:', error)
       }
@@ -26,66 +50,37 @@ const Home = () => {
   return (
     <div>
 
-      <div className='flex p-4 bg-white shadow-md'>
+      <Nav />
 
-        <nav className='flex justify-between items-center w-full'>
-
-          <div className='flex items-center gap-2 ml-5 cursor-pointer'>
-            <IoMdReverseCamera className='text-cyan-600 text-2xl' />
-            <p className='text-xl font-bold text-cyan-700'>Pictoria</p>
-          </div>
-
-          <div className='w-full max-w-lg'>
-            <input
-              type='text'
-              placeholder='Search'
-              className='bg-white border-2 focus:outline-none rounded-full p-3 w-full' />
-          </div>
-
-          <div className='flex gap-5 mr-5'>
-
-            <button className=' border rounded-full px-4 bg-white hover:bg-cyan-600 hover:text-white'>Log In</button>
-            <button className=' border rounded-full px-4 bg-white hover:bg-cyan-600 hover:text-white'>Sign Up</button>
-
-            <button
-              className="flex items-center bg-cyan-600 py-2 px-4 outline-none rounded-full hover:bg-cyan-700"
-              onClick={() => setUploadModal(true)}
-              >
-              <div className="flex items-center gap-1">
-                <MdOutlineFileUpload className="text-2xl text-white" />
-                <span className="text-white font-bold">Upload</span>
-              </div>
-              
-            </button>
-
-            { uploadModal && <Upload isOpen={uploadModal} onClose={() => setUploadModal(false)} />}
-        
-          </div>
-
-        </nav>
-
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4 h-100 md:h-82 lg:h-120">
-        {images.map((image) => (
-          <div key={image.id} className="rounded overflow-hidden shadow-lg">
-            <div className='relative'>
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 p-4">
+        {[...images, ...myImages].map((image) => (
+          <div key={image.id} className="relative rounded overflow-hidden shadow-lg group">
+            <div className=''>
               <img
-                src={image.webformatURL}
+                src={image.webformatURL || image.url}
                 alt={image.tags}
-                className="w-full h-full object-cover"
+                className="w-full h-72 object-cover"
               />
-              <div className='overlay absolute top-0 left-0 w-full bg-black bg-opacity-50 flex justify-center items-center opacity-0 hover:opacity-100 transition-opacity duration-300'>
-                <p className='text-white'>{image.tags || 'Give it a Guess!'}</p>
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <p className="text-white text-center text-sm p-2">{image.tags || "Give it a Guess!"}</p>
+
+                <button
+                  className='absolute bottom-2 right-2 text-white text-2xl '
+                  onClick={() => downloadImage(image.url || image.webformatURL)}
+                >
+                  <FiDownload />
+                </button>
+
               </div>
             </div>
-
           </div>
+
         ))}
       </div>
+
 
     </div>
   )
 }
 
-export default Home
+export default DisplayImages
