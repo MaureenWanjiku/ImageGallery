@@ -2,7 +2,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { FiDownload } from "react-icons/fi";
-import Nav from '../nav/page';
+import Nav from '../../component/nav';
 
 const DisplayImages = () => {
   const [images, setImages] = useState([])
