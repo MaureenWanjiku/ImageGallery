@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { IoMdReverseCamera } from "react-icons/io";
 import { MdOutlineFileUpload } from "react-icons/md";
-import Upload from '../upload/page';
+import Uploadgi from '@/component/upload';
 
 const Nav = () => {
     const [uploadModal, setUploadModal] = useState(false)
